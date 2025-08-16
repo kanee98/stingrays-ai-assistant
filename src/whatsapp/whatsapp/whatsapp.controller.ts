@@ -1,8 +1,11 @@
-import { Controller, Get, Req } from '@nestjs/common';
-import { Request } from 'express';
+import { Body, Controller, Get, HttpCode, Post, Req } from '@nestjs/common';
+import * as process from 'node:process';
+import { WhatsappService } from './whatsapp.service';
+
 
 @Controller('whatsapp')
 export class WhatsappController {
+    constructor(private readonly whatsAppService: WhatsappService){}
 
     @Get('webhook')
     whatsappVerificationChallenge(@Req() request){
@@ -18,6 +21,26 @@ export class WhatsappController {
 
         if(mode === 'subscribe' && token === verificationToken){
             return challenge?.toString();
+        }
+    }
+
+    @Post('webhook')
+    @HttpCode(200)
+    async handleIncomingWhatsappMessage(@Body() request){
+        const {messages} = request?.entry?.[0]?.changes?.[0].value ?? {};
+        if (!messages) return;
+
+        const message = messages[0];
+        const messageSender = message.from;
+        const messageID = message.id;
+
+        switch (message.type){
+            case 'text':
+                const text = message.text.body;
+                
+                await this.whatsAppService.sendWhatsAppMessage(messageSender);
+                
+                break;
         }
     }
 }
