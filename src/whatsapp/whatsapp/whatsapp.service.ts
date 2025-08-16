@@ -11,7 +11,7 @@ export class WhatsappService {
         const config = {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': ''
+                'Authorization': `Bearer ${process.env.WHATSAPP_CLOUD_API_ACCESS_TOKEN}`,
             },
         };
         const data = JSON.stringify({

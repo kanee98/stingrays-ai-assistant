@@ -5,7 +5,7 @@ import { WhatsappModule } from './whatsapp/whatsapp.module';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [ConfigModule, WhatsappModule],
+  imports: [ConfigModule.forRoot(), WhatsappModule],
   controllers: [AppController],
   providers: [AppService],
 })
