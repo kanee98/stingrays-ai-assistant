@@ -1,11 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Redis } from 'ioredis';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class UserContextService {
     private readonly logger = new Logger(UserContextService.name);
     private readonly redis = new Redis(process.env.REDIS_URL || '');
+    private readonly salt = process.env.HASHING_SALT || '';
     
+    hashPhoneNumber(phoneNumber: string){
+        const hashedPhoneNumber = crypto
+            .createHmac('sha256', this.salt)
+            .update(phoneNumber)
+            .digest('hex');
+        return hashedPhoneNumber;
+    }
+
     async saveToContext(
         content:string, 
         role:'user' | 'assistant' | 'system', 
@@ -13,7 +23,8 @@ export class UserContextService {
     ){
         try{
             const value = JSON.stringify({ role, content});
-            await this.redis.rpush(userID, value);
+            const hashedUserID = this.hashPhoneNumber(userID);
+            await this.redis.rpush(hashedUserID, value);
             return 'Context Saved';
         } catch(error){
             this.logger.error('Error Saving Context', error);
@@ -30,8 +41,10 @@ export class UserContextService {
             const pipeline = this.redis.pipeline();
             const value = JSON.stringify({ role, content});
             
-            pipeline.rpush(userID, value);
-            pipeline.lrange(userID, 0, -1);
+            const hashedUserID = this.hashPhoneNumber(userID);
+
+            pipeline.rpush(hashedUserID, value);
+            pipeline.lrange(hashedUserID, 0, -1);
 
             const results = await pipeline.exec();
 
@@ -51,7 +64,8 @@ export class UserContextService {
 
     async getConversationHistory(userID: string){
         try{
-            const conversation = await this.redis.lrange(userID, 0, -1);
+            const hashedUserID = this.hashPhoneNumber(userID);
+            const conversation = await this.redis.lrange(hashedUserID, 0, -1);
 
             return conversation.map((item)=>JSON.parse(item));
         }catch(error){
