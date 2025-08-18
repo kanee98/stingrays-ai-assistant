@@ -105,7 +105,7 @@ export class OpenaiService {
                         Trinity Pool and Leisure Pool Saturyday and Sunday from 8am to 5pm
                     - Max Students: 6 per class.
                     - Enrollment: Fill out an online form + pay registration fee. We confirm via WhatsApp within 24hrs.
-                    - If I couldn't give you a proper solutiopn or if you need to contact a human assistant please feel free to contact: +94 76 393 8686 
+                    - If I couldn't give you a proper solutiopn or if you need to contact a human assistant please feel free to contact: Mrs. Gayani - +94 77 577 1363 
 
             ⚠️ IMPORTANT: Never answer out-of-scope questions. If unsure, say:  
             "I can only help with Stingrays Swim School related queries 🌊😊. Would you like class schedules, enrollment info, or location details?"  
