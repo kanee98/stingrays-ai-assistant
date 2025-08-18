@@ -2,15 +2,23 @@ import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { catchError, lastValueFrom, map } from 'rxjs';
 import { OpenaiService } from 'src/openai/openai.service';
+import { UserContextService } from 'src/user-context/user-context.service';
 
 @Injectable()
 export class WhatsappService {
-    constructor(private readonly openaiService: OpenaiService){}
+    constructor(
+        private readonly openaiService: OpenaiService,
+        private readonly context: UserContextService,
+    ){}
 
-    private readonly httpService = new HttpService();
     private readonly logger = new Logger(WhatsappService.name);
+    private readonly httpService = new HttpService();
+
     async sendWhatsAppMessage(messageSender: string, userInput: string){
-        const aiResponse = await this.openaiService.generatedAIResponse(userInput);
+        const aiResponse = await this.openaiService.generatedAIResponse(
+            messageSender,
+            userInput,
+        );
         const url = `https://graph.facebook.com/${process.env.WHATSAPP_CLOUD_API_VERSION}/${process.env.WHATSAPP_CLOUD_API_PHONE_NUMBER_ID}/messages`;
         const config = {
             headers: {
