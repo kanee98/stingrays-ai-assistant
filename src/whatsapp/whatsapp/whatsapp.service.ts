@@ -75,5 +75,27 @@ export class WhatsappService {
             status: 'read',
             message_id: messageID,
         });
+
+        try {
+            const response = this.httpService
+                .post(url, data, config)
+                .pipe(
+                    map((res) => res.data))
+                .pipe(
+                    catchError((error) => {
+                        this.logger.error(error);
+                        throw new BadRequestException(
+                            'Error marking message as read in WhatsApp Cloud API',
+                        );
+                    }),
+                );
+
+            const result = await lastValueFrom(response);
+            this.logger.log(`Marked message ${messageID} as read ✅`, result);
+            return result;
+        } catch (error) {
+            this.logger.error(error);
+            return null;
+        }
     }
 }
