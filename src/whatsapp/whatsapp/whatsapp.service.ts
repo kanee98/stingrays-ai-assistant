@@ -10,7 +10,7 @@ export class WhatsappService {
     private readonly httpService = new HttpService();
     private readonly logger = new Logger(WhatsappService.name);
     async sendWhatsAppMessage(messageSender: string, userInput: string){
-        const aiResponse = this.openaiService.generatedAIResponse(userInput);
+        const aiResponse = await this.openaiService.generatedAIResponse(userInput);
         const url = `https://graph.facebook.com/${process.env.WHATSAPP_CLOUD_API_VERSION}/${process.env.WHATSAPP_CLOUD_API_PHONE_NUMBER_ID}/messages`;
         const config = {
             headers: {
@@ -25,8 +25,7 @@ export class WhatsappService {
             type: 'text',
             text: {
                 preview_url:false,
-                // body: aiResponse,
-                body: 'Hey there!',
+                body: aiResponse,
             },
         });
 
