@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { WhatsappController } from './whatsapp/whatsapp.controller';
 import { WhatsappService } from './whatsapp/whatsapp.service';
-import { OpenaiModule } from '../openai/openai.module';
+import { OpenaiService } from '../openai/openai.service';
+import { UserContextService } from 'src/user-context/user-context.service';
 
 @Module({
-  imports: [OpenaiModule],
   controllers: [WhatsappController],
-  providers: [WhatsappService]
+  providers: [OpenaiService, WhatsappService, UserContextService]
 })
 export class WhatsappModule {}
