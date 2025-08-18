@@ -7,6 +7,7 @@ export class UserContextService {
     private readonly logger = new Logger(UserContextService.name);
     private readonly redis = new Redis(process.env.REDIS_URL || '');
     private readonly salt = process.env.HASHING_SALT || '';
+    private readonly contextExpirationTime = 10800;
     
     hashPhoneNumber(phoneNumber: string){
         const hashedPhoneNumber = crypto
@@ -25,6 +26,8 @@ export class UserContextService {
             const value = JSON.stringify({ role, content});
             const hashedUserID = this.hashPhoneNumber(userID);
             await this.redis.rpush(hashedUserID, value);
+            await this.redis.expire(hashedUserID, this.contextExpirationTime);
+
             return 'Context Saved';
         } catch(error){
             this.logger.error('Error Saving Context', error);
@@ -44,7 +47,10 @@ export class UserContextService {
             const hashedUserID = this.hashPhoneNumber(userID);
 
             pipeline.rpush(hashedUserID, value);
+
             pipeline.lrange(hashedUserID, 0, -1);
+
+            pipeline.expire(hashedUserID, this.contextExpirationTime);
 
             const results = await pipeline.exec();
 
